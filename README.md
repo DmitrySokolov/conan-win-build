@@ -2,13 +2,18 @@
 
 1) Clone this repository, or just download `build_conan.ps1`
 
-2) Run `.\build_conan.ps1 -Branch 'origin/release/2.19'`
+2) Run `.\build_conan.ps1 -Branch 'upstream/release/2.21'`
 
 
 ## Building from existed `conan` source folder
 
-Just copy `build_conan.ps1` to the existed `conan` source folder.
+1a. Just copy `build_conan.ps1` to the existed `conan` source folder.
 
-Or specify the `conan` source folder using `-Path` parameter:
+1b. Or specify the `conan` source folder using `-Path` parameter:
 
-    `.\build_conan.ps1 -Path path\to\conan -Branch 'origin/release/2.19'`
+    `.\build_conan.ps1 -Path path\to\conan -Branch 'upstream/release/2.21'`
+
+
+## Result binaries
+
+The app binaries will be in the folder `.\installer\pyinstaller\dist\conan`

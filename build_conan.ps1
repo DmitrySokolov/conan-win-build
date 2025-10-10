@@ -1,6 +1,6 @@
 param(
   [string] $Path = '',
-  [string] $Branch = 'origin/release/2.19',
+  [string] $Branch = 'upstream/release/2.19',
   [switch] $WhatIf = $false
 )
 
@@ -30,22 +30,24 @@ function Push-WD
 
 $needCheckout = $false
 
-$conanDir = $PSScriptRoot
+$workDir = $PSScriptRoot
+
+$sourceDir = $PSScriptRoot
 if ($Path.Length -gt 0) {
-  $conanDir = $Path
+  $sourceDir = Convert-Path $Path
 }
-if (-not (Test-Path "$conanDir\conan\__init__.py")) {
-  $conanDir = "$conanDir\conan.git"
+if (-not (Test-Path "$sourceDir\conan\__init__.py")) {
+  $sourceDir = "$sourceDir\conan.git"
 }
-if (-not (Test-Path $conanDir)) {
-  Invoke-Cmd  git clone https://github.com/conan-io/conan.git $conanDir
+if (-not (Test-Path $sourceDir)) {
+  Invoke-Cmd  git clone https://github.com/conan-io/conan.git $sourceDir
   $needCheckout = $true
 }
-if ($needCheckout -or (Test-Path "$conanDir\.git")) {
-  Invoke-Cmd  git -C $conanDir checkout -B my_branch $Branch
+if ($needCheckout -or (Test-Path "$sourceDir\.git")) {
+  Invoke-Cmd  git -C $sourceDir checkout -B my_branch $Branch
 }
 
-$installerDir = "$conanDir\installer"
+$installerDir = "$workDir\installer"
 if (Test-Path $installerDir) {
   Invoke-Cmd  Remove-Item -Recurse $installerDir
 }
@@ -56,8 +58,8 @@ try {
   Invoke-Cmd  py -3 -m venv .venv
   Invoke-Cmd  .\.venv\Scripts\Activate.ps1
   Invoke-Cmd  pip install -U wheel pyinstaller
-  Invoke-Cmd  pip install -U -r ..\conans\requirements.txt
-  Invoke-Cmd  python ..\pyinstaller.py --onefile
+  Invoke-Cmd  pip install -U -r $sourceDir\conans\requirements.txt
+  Invoke-Cmd  python "$sourceDir\pyinstaller.py" "--onefile"
 }
 finally {
   Invoke-Cmd  Pop-Location
